@@ -1,0 +1,211 @@
+<html>
+
+<head>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <style>
+        #map {
+            height: 100%;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgX9ICiGpqq19y6wjAKtMtsVpP8setxEc&callback=initMap&region=kr"></script>
+    <script>
+        let map;
+        let cctvMarker;
+        let infoWindow;
+        let currentMakrer;
+
+         function initMap() {
+            const styledMapType = new google.maps.StyledMapType(
+                [
+                    {
+                        "elementType": "geometry.stroke",
+                        "stylers": [
+                            {
+                                "color": "#a9b7fe"
+                            },
+                            {
+                                "weight": 1.5
+                            }
+                        ]
+                    },
+                    {
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            {
+                                "color": "#000000"
+                            },
+                            {
+                                "weight": 3.5
+                            }
+                        ]
+                    },
+                    {
+                        "elementType": "labels.text.stroke",
+                        "stylers": [
+                            {
+                                "color": "#000000"
+                            },
+                            {
+                                "weight": 0.5
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "administrative.land_parcel",
+                        "elementType": "labels",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "landscape.man_made",
+                        "elementType": "geometry.stroke",
+                        "stylers": [
+                            {
+                                "color": "#e0e0e0"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "landscape.natural",
+                        "elementType": "geometry.fill",
+                        "stylers": [
+                            {
+                                "color": "#ffffff"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi",
+                        "elementType": "labels.text",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi.business",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi.park",
+                        "elementType": "labels.text",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi.school",
+                        "elementType": "geometry.fill",
+                        "stylers": [
+                            {
+                                "color": "#eceffe"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi.school",
+                        "elementType": "geometry.stroke",
+                        "stylers": [
+                            {
+                                "color": "#eceffe"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.local",
+                        "elementType": "labels",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    }
+                ],
+                { name: "Styled Map" }
+            );
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 37.886253, lng: 127.735648 },
+                zoom: 16,
+                mapTypeControlOptions: {
+                    mapTypeIds: ["roadmap", "satellite", "hybrid", "terrain", "styled_map"],
+                },
+            });
+            map.mapTypes.set("styled_map", styledMapType);
+            map.setMapTypeId("styled_map");
+
+            map.addListener("click", (e) => {
+                try { onTap.postMessage(""); } catch (err) {}
+            });
+
+            cctvMarker =  new google.maps.Marker({
+                position: { lat: 37.876517, lng: 127.735891},
+                icon:"https://github.com/WorldOneTop/hci_googlemap/blob/master/assets/cctvMarker.png?raw=true",
+                title:"팔호광장"
+            });
+            currentMakrer = new google.maps.Marker();
+            
+            infoWindow = new google.maps.InfoWindow();
+            cctvMarker.addListener("click", () => {
+                if(infoWindow.map == null){
+                    infoWindow.setContent(cctvMarker.getTitle());
+                    infoWindow.open(cctvMarker.getMap(), cctvMarker);
+                }else{
+                    try { onCCTVTap.postMessage(""); } catch (err) {}
+                }
+            });
+        }
+
+
+        function zoomChange(isScale){
+            if(isScale){
+                document.getElementsByClassName("gm-control-active")[3].click();
+            }
+            else {
+                document.getElementsByClassName("gm-control-active")[4].click();
+            }
+        }
+        function toggleCCTVMarker(){
+            if(cctvMarker.map == null){
+                cctvMarker.setMap(map);
+            }else{
+                cctvMarker.setMap(null);
+                if(infoWindow.map != null){
+                    infoWindow.close();
+                }
+            }
+            
+        }
+        function currentLocation(la, ln){
+            map.setCenter({lat: la, lng: ln});
+            currentMakrer.setPosition({lat: la, lng: ln});
+            currentMakrer.setMap(map);
+        }
+
+
+
+    </script>
+</body>
+
+</html>
